@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maryland Medicaid Eligibility & Work Requirement Screener</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-header {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .section-header h2 {
+            color: #2c3e50;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+        
+        .section-header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .question {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .question-label {
+            display: block;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .question-sublabel {
+            display: block;
+            color: #7f8c8d;
+            font-size: 13px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="number"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .radio-option {
+            flex: 1;
+        }
+        
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+        
+        .radio-option label {
+            display: block;
+            padding: 12px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .radio-option input[type="radio"]:checked + label {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .radio-option label:hover {
+            border-color: #3498db;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .result-box {
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .result-success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            color: #155724;
+        }
+        
+        .result-warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+        }
+        
+        .result-danger {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+            color: #721c24;
+        }
+        
+        .result-info {
+            background: #d1ecf1;
+            border: 2px solid #17a2b8;
+            color: #0c5460;
+        }
+        
+        .result-box h3 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .result-box p {
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        
+        .exemption-list {
+            margin-top: 15px;
+        }
+        
+        .exemption-item {
+            background: white;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .exemption-item strong {
+            display: block;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .exemption-item span {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .disclaimer {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+        
+        .disclaimer h3 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .disclaimer p {
+            color: #856404;
+            line-height: 1.6;
+            margin: 5px 0;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: #ecf0f1;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            transition: width 0.3s;
+        }
+        
+        ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        li {
+            margin: 5px 0;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            background: #fff9c4;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+        
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Maryland Medicaid Eligibility & Work Requirement Screener</h1>
+            <p>Version 1.0 - January 2026</p>
+        </div>
+        
+        <div class="content">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+            </div>
+            
+            <!-- Welcome Section -->
+            <div class="section active" id="welcome">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="font-size: 32px; color: #2c3e50; margin-bottom: 20px;">Big Changes Are Coming to Medicaid</h2>
+                    <p style="font-size: 18px; color: #7f8c8d; line-height: 1.8;">This tool will help you understand your Medicaid eligibility and the new work requirement.</p>
+                </div>
+                
+                <div class="info-box">
+                    <h3 style="font-size: 24px; color: #2c3e50; margin-bottom: 15px;">What is this about?</h3>
+                    
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li>Starting in 2027, some people on Medicaid may need to work 80 hours each month to keep their Medicaid coverage.</li>
+                        <li>This can be confusing; we don't want you to lose your health coverage.</li>
+                    </ul>
+                    
+                    <p style="margin-top: 15px;">This questionnaire will help you shed light on what these new rules might mean for you.</p>
+                </div>
+                
+                <div class="info-box">
+                    <p><strong>This tool will help you:</strong></p>
+                    <ul>
+                        <li>✓ See if you qualify for Medicaid based on income</li>
+                        <li>✓ See if you have to work 80 hours each month</li>
+                        <li>✓ Understand what to do next</li>
+                    </ul>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px;">
+                    <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 10px;"><strong>Need to apply for Medicaid?</strong></p>
+                    <p style="color: #7f8c8d; font-size: 14px;">Website: <strong>marylandhealthconnection.gov</strong> | Phone: <strong>1-855-642-8572</strong></p>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-primary" onclick="startScreening()">Start Screening</button>
+                </div>
+            </div>
+            
+            <!-- Part 1: Basic Eligibility -->
+            <div class="section" id="part1">
+                <div class="section-header">
+                    <h2>Part 1: Medicaid Income Eligibility</h2>
+                    <p>Let's check if your household income qualifies for Medicaid</p>
+                </div>
+                
+                <div class="question">
+                    <label class="question-label">1. How many people are in your household?</label>
+                    <span class="question-sublabel">Include yourself, your spouse (if married), and any dependents you claim on taxes.</span>
+                    <input type="number" id="householdSize" min="1" max="20" value="1">
+                </div>
+                
+                <div class="question">
+<label class="question-label">2. What is your total household annual income?</label>
+                    <span class="question-sublabel">Include income from all sources for your entire household. If married and living together, include both your income and your spouse's income combined (wages, self-employment, benefits, etc.)</span>
+                    <input type="number" id="annualIncome" min="0" step="100" placeholder="Enter amount in dollars">
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="goToSection('welcome')">Back</button>
+                    <button class="btn-primary" onclick="checkEligibility()">Check Eligibility</button>
+                </div>
+            </div>
+            
+            <!-- Eligibility Results -->
+            <div class="section" id="eligibilityResults">
+                <div class="section-header">
+                    <h2>Medicaid Eligibility Result</h2>
+                </div>
+                
+                <div id="eligibilityResultContent"></div>
+                
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="goToSection('part1')">Back</button>
+                    <button class="btn-primary" id="continueToExemptions" onclick="goToSection('part2')">Continue to Exemption Screening</button>
+                </div>
+            </div>
+            
+            <!-- Part 2: Work Requirement Check -->
+            <div class="section" id="part2">
+                <div class="section-header">
+                    <h2>Part 2: New Rules Starting in 2027</h2>
+                    <p>To keep your Medicaid, you must do one of these each month:</p>
+                    <ul style="margin-top: 10px; color: #2c3e50;">
+                        <li><strong>Work</strong> - at least 80 hours each month</li>
+                        <li><strong>Volunteer</strong> - at least 80 hours each month</li>
+                        <li><strong>Go to school</strong> - at least part-time</li>
+                        <li><strong>Job training</strong> - at least 80 hours each month</li>
+                    </ul>
+                </div>
+                
+                <div class="disclaimer">
+                    <h3>⚠️ What is Known and What is Not Known</h3>
+                    <p><strong>What is Known:</strong></p>
+                    <ul>
+                        <li>The law passed in July 2025 and will start this year</li>
+                        <li>The new rules won't apply to everyone on Medicaid. There are important exceptions.</li>
+                    </ul>
+                    <p><strong>What is Not Known:</strong></p>
+                    <ul>
+                        <li>The government has not decided yet on some parts of the new law</li>
+                        <li>The paperwork you must submit to keep your Medicaid is not yet known</li>
+                    </ul>
+                </div>
+                
+                <div class="info-box">
+                    <p><strong>Let's see if you are already meeting the work requirement</strong></p>
+                </div>
+                
+                <!-- Already Meeting Requirement Check -->
+                <div class="question">
+                    <label class="question-label">Are you currently doing ANY of the following?</label>
+                    <span class="question-sublabel">Select YES if you are already doing at least one of these activities</span>
+                </div>
+                
+                <div class="question">
+                    <label class="question-label">1. Do you work at least 80 hours each month?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="workingNow-yes" name="workingNow" value="yes">
+                            <label for="workingNow-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="workingNow-no" name="workingNow" value="no" checked>
+                            <label for="workingNow-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question">
+                    <label class="question-label">2. Do you volunteer at least 80 hours each month?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="volunteering-yes" name="volunteering" value="yes">
+                            <label for="volunteering-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="volunteering-no" name="volunteering" value="no" checked>
+                            <label for="volunteering-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question">
+                    <label class="question-label">3. Do you go to school at least part-time?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="inSchool-yes" name="inSchool" value="yes">
+                            <label for="inSchool-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="inSchool-no" name="inSchool" value="no" checked>
+                            <label for="inSchool-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="question">
+                    <label class="question-label">4. Are you in job training at least 80 hours each month?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="jobTraining-yes" name="jobTraining" value="yes">
+                            <label for="jobTraining-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="jobTraining-no" name="jobTraining" value="no" checked>
+                            <label for="jobTraining-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="goToSection('eligibilityResults')">Back</button>
+                    <button class="btn-primary" onclick="checkIfMeetingRequirement()">Continue</button>
+                </div>
+            </div>
+            
+            <!-- Part 3: Exemption Check -->
+            <div class="section" id="part3">
+                <div class="section-header">
+                    <h2>Part 3: Exemption Status</h2>
+                </div>
+                
+                <div class="info-box">
+                    <p style="font-size: 18px; font-weight: 600; color: #2c3e50; margin-bottom: 15px;">Let's see if you are exempt from these new activity requirements.</p>
+                </div>
+                
+                <div class="info-box">
+                    <p><strong>Note:</strong> If you are under 19 or 65 or older, you can skip these questions - you do not have to work.</p>
+                </div>
+                
+                <!-- Age -->
+                <div class="question">
+                    <label class="question-label">1. What is your age?</label>
+                    <input type="number" id="age" min="0" max="120" placeholder="Enter your age">
+                </div>
+                
+                <!-- Children -->
+                <div class="question">
+                    <label class="question-label">2. Are you a parent or caregiver of a child age 13 or younger?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="youngChild-yes" name="youngChild" value="yes">
+                            <label for="youngChild-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="youngChild-no" name="youngChild" value="no" checked>
+                            <label for="youngChild-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Medicare -->
+                <div class="question">
+                    <label class="question-label">3. Are you enrolled in Medicare?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="medicare-yes" name="medicare" value="yes">
+                            <label for="medicare-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="medicare-no" name="medicare" value="no" checked>
+                            <label for="medicare-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- SSI/SSDI -->
+                <div class="question">
+                    <label class="question-label">4. Do you receive SSI or SSDI?</label>
+                    <span class="question-sublabel">SSI = Supplemental Security Income, SSDI = Social Security Disability Insurance</span>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="ssi-yes" name="ssi" value="yes">
+                            <label for="ssi-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="ssi-no" name="ssi" value="no" checked>
+                            <label for="ssi-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pregnancy -->
+                <div class="question">
+                    <label class="question-label">5. Are you currently pregnant OR did you have a baby in the last 12 months?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="pregnant-yes" name="pregnant" value="yes">
+                            <label for="pregnant-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="pregnant-no" name="pregnant" value="no" checked>
+                            <label for="pregnant-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Medically Frail -->
+                <div class="question">
+                    <label class="question-label">6. Do you have a disability, serious medical condition, or are medically frail?</label>
+                    <span class="question-sublabel">This includes: physical/intellectual/developmental disabilities, chronic substance use disorder, disabling mental disorders, or serious/complex medical conditions</span>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="medicallyFrail-yes" name="medicallyFrail" value="yes">
+                            <label for="medicallyFrail-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="medicallyFrail-no" name="medicallyFrail" value="no" checked>
+                            <label for="medicallyFrail-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Family Caregiver -->
+                <div class="question">
+                    <label class="question-label">7. Are you a family caregiver?</label>
+                    <span class="question-sublabel">Do you provide care to someone with a chronic health condition, disability, or functional limitation? (elderly parents, relatives, friends, neighbors, etc.)</span>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="caregiver-yes" name="caregiver" value="yes">
+                            <label for="caregiver-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="caregiver-no" name="caregiver" value="no" checked>
+                            <label for="caregiver-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Substance Use Treatment -->
+                <div class="question">
+                    <label class="question-label">8. Are you participating in a drug or alcohol treatment program?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="treatment-yes" name="treatment" value="yes">
+                            <label for="treatment-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="treatment-no" name="treatment" value="no" checked>
+                            <label for="treatment-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Veteran -->
+                <div class="question">
+                    <label class="question-label">9. Are you a veteran with a 100% VA disability rating?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="veteran-yes" name="veteran" value="yes">
+                            <label for="veteran-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="veteran-no" name="veteran" value="no" checked>
+                            <label for="veteran-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- American Indian/Alaska Native -->
+                <div class="question">
+                    <label class="question-label">10. Are you American Indian, Alaska Native, or California Indian?</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="native-yes" name="native" value="yes">
+                            <label for="native-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="native-no" name="native" value="no" checked>
+                            <label for="native-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Recently Incarcerated -->
+                <div class="question">
+                    <label class="question-label">11. Were you recently released from jail or prison?</label>
+                    <span class="question-sublabel">Released within the last 3 months</span>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="incarcerated-yes" name="incarcerated" value="yes">
+                            <label for="incarcerated-yes">Yes</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="incarcerated-no" name="incarcerated" value="no" checked>
+                            <label for="incarcerated-no">No</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="goToSection('part2')">Back</button>
+                    <button class="btn-primary" onclick="checkExemptions()">Check Exemptions</button>
+                </div>
+            </div>
+            
+            <!-- Exemption Results -->
+            <div class="section" id="exemptionResults">
+                <div class="section-header">
+                    <h2>Work Requirement Exemption Results</h2>
+                </div>
+                
+                <div id="exemptionResultContent"></div>
+                
+                <div class="button-group">
+                    <button class="btn-secondary" onclick="goToSection('part3')">Back</button>
+                    <button class="btn-primary" id="continueToGuidance" onclick="showFinalResults()">View Final Results</button>
+                    <button class="btn-primary" id="viewFinalResults" onclick="showFinalResults()" style="display: none;">View Final Results</button>
+                </div>
+            </div>
+            
+            <!-- Final Results -->
+            <div class="section" id="finalResults">
+                <div class="section-header">
+                    <h2>Complete Screening Summary</h2>
+                </div>
+                
+                <div id="finalResultContent"></div>
+                
+                <div id="nextStepsContent"></div>
+                
+                <div class="button-group">
+                    <button class="btn-primary" onclick="printResults()">Print Results</button>
+                    <button class="btn-secondary" onclick="startOver()">Start Over</button>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; padding: 30px 20px; margin-top: 40px; border-top: 1px solid #ddd; color: #666; font-size: 14px;">
+            <p style="margin: 0;">© Copyright Capital Integrated Care, LLC. All rights reserved.</p>
+            <p style="margin: 5px 0 0 0;">No portion of this program should be copied or used without permission.</p>
+        </div>
+    </div>
+    
+    <script>
+        // Federal Poverty Levels 2026 (approximate)
+        const FPL_2026 = {
+            1: 15650, 2: 21137, 3: 26624, 4: 32111,
+            5: 37598, 6: 43085, 7: 48572, 8: 54059
+        };
+        
+        const MD_MIN_WAGE = 15.00;
+        const MEDICAID_PERCENTAGE = 1.38;
+        
+        let screeningData = {
+            householdSize: 0,
+            annualIncome: 0,
+            eligible: false,
+            age: 0,
+            exemptions: []
+        };
+        
+        function getFPL(size) {
+            if (size <= 8) return FPL_2026[size];
+            return FPL_2026[8] + (size - 8) * 5487;
+        }
+        
+        function getMedicaidLimit(size) {
+            return getFPL(size) * MEDICAID_PERCENTAGE;
+        }
+        
+        function formatCurrency(amount) {
+            return '$' + amount.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+        }
+        
+        function goToSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            window.scrollTo(0, 0);
+            updateProgress();
+        }
+        
+        function updateProgress() {
+            const sections = ['welcome', 'part1', 'eligibilityResults', 'part2', 'exemptionResults', 'part3', 'finalResults'];
+            const currentSection = document.querySelector('.section.active').id;
+            const currentIndex = sections.indexOf(currentSection);
+            const progress = ((currentIndex + 1) / sections.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+        
+        function startScreening() {
+            goToSection('part1');
+        }
+        
+        function checkEligibility() {
+            const householdSize = parseInt(document.getElementById('householdSize').value);
+            const annualIncome = parseFloat(document.getElementById('annualIncome').value);
+            
+            if (!householdSize || isNaN(annualIncome)) {
+                alert('Please complete all fields');
+                return;
+            }
+            
+            screeningData.householdSize = householdSize;
+            screeningData.annualIncome = annualIncome;
+            
+            const limit = getMedicaidLimit(householdSize);
+            const eligible = annualIncome <= limit;
+            screeningData.eligible = eligible;
+            
+            let resultHTML = '';
+            
+            resultHTML += `<div class="result-box result-info">`;
+            resultHTML += `<p><strong>Household size:</strong> ${householdSize}</p>`;
+            resultHTML += `<p><strong>Annual income:</strong> ${formatCurrency(annualIncome)}</p>`;
+            resultHTML += `<p><strong>Medicaid income limit (138% FPL):</strong> ${formatCurrency(limit)}</p>`;
+            resultHTML += `<p><strong>Monthly limit:</strong> ${formatCurrency(limit/12)}</p>`;
+            resultHTML += `</div>`;
+            
+            if (eligible) {
+                const difference = limit - annualIncome;
+                resultHTML += `<div class="result-box result-success">`;
+                resultHTML += `<h3>✓ YOU APPEAR TO BE INCOME-ELIGIBLE FOR MEDICAID</h3>`;
+                resultHTML += `<p>Your income is <strong>${formatCurrency(difference)}</strong> below the limit.</p>`;
+                resultHTML += `</div>`;
+                
+                document.getElementById('continueToExemptions').style.display = 'block';
+                document.getElementById('continueToExemptions').onclick = function() { goToSection('part2'); };
+            } else {
+                const difference = annualIncome - limit;
+                resultHTML += `<div class="result-box result-danger">`;
+                resultHTML += `<h3>✗ YOUR INCOME EXCEEDS THE MEDICAID LIMIT</h3>`;
+                resultHTML += `<p>You are <strong>${formatCurrency(difference)}</strong> over the limit.</p>`;
+                resultHTML += `<p>You may be eligible for subsidized health insurance through Maryland Health Connection instead.</p>`;
+                resultHTML += `</div>`;
+                
+                document.getElementById('continueToExemptions').style.display = 'none';
+            }
+            
+            document.getElementById('eligibilityResultContent').innerHTML = resultHTML;
+            goToSection('eligibilityResults');
+        }
+        
+        
+        function checkIfMeetingRequirement() {
+            const workingNow = document.querySelector('input[name="workingNow"]:checked').value === 'yes';
+            const volunteering = document.querySelector('input[name="volunteering"]:checked').value === 'yes';
+            const inSchool = document.querySelector('input[name="inSchool"]:checked').value === 'yes';
+            const jobTraining = document.querySelector('input[name="jobTraining"]:checked').value === 'yes';
+            
+            // If any of these is YES, they're already meeting the requirement
+            if (workingNow || volunteering || inSchool || jobTraining) {
+                showMeetingRequirementScreen();
+            } else {
+                // They're NOT meeting requirement, check for exemptions
+                goToSection('part3');
+            }
+        }
+        
+        function showMeetingRequirementScreen() {
+            let resultHTML = '';
+            
+            resultHTML += `<div class="result-box result-success">`;
+            resultHTML += `<h3>✓ You Are Already Meeting the Work Requirements</h3>`;
+            resultHTML += `<p>Based on your answers, you are already doing activities that meet the 80-hour monthly requirement.</p>`;
+            resultHTML += `</div>`;
+            
+            resultHTML += `<div class="result-box result-info">`;
+            resultHTML += `<h3>What This Means:</h3>`;
+            resultHTML += `<p>You should be able to keep your Medicaid coverage as long as you continue these activities.</p>`;
+            resultHTML += `<p><strong>Important:</strong></p>`;
+            resultHTML += `<ul>`;
+            resultHTML += `<li>Keep records of your hours (pay stubs, volunteer logs, school enrollment, training certificates)</li>`;
+            resultHTML += `<li>You will need to verify your activities every 6 months at renewal</li>`;
+            resultHTML += `<li>Report any changes in your work or school status to Medicaid</li>`;
+            resultHTML += `</ul>`;
+            resultHTML += `</div>`;
+            
+            resultHTML += `<div class="result-box result-info">`;
+            resultHTML += `<h3>📋 Next Steps</h3>`;
+            resultHTML += `<p><strong>1. KEEP RECORDS</strong></p>`;
+            resultHTML += `<ul>`;
+            resultHTML += `<li>Save pay stubs if working</li>`;
+            resultHTML += `<li>Get verification letters from volunteer coordinators</li>`;
+            resultHTML += `<li>Keep school enrollment verification</li>`;
+            resultHTML += `<li>Save job training certificates or attendance records</li>`;
+            resultHTML += `</ul>`;
+            resultHTML += `<p><strong>2. WATCH FOR NOTICES</strong></p>`;
+            resultHTML += `<ul>`;
+            resultHTML += `<li>States will send outreach starting summer 2026</li>`;
+            resultHTML += `<li>Respond to all notices within 30 days</li>`;
+            resultHTML += `<li>Update contact information with Medicaid</li>`;
+            resultHTML += `</ul>`;
+            resultHTML += `<p><strong>3. GET HELP IF NEEDED</strong></p>`;
+            resultHTML += `<ul>`;
+            resultHTML += `<li>Visit [website coming soon]</li>`;
+            resultHTML += `<li>For MedStar Family Choice Members call [phone number]</li>`;
+            resultHTML += `</ul>`;
+            resultHTML += `</div>`;
+            
+            document.getElementById('exemptionResultContent').innerHTML = resultHTML;
+            document.getElementById('continueToGuidance').style.display = 'none';
+            document.getElementById('viewFinalResults').style.display = 'none';
+            
+            // Update back button to go to part2
+            const backButton = document.querySelector('#exemptionResults .btn-secondary');
+            backButton.textContent = 'Back';
+            backButton.onclick = function() { goToSection('part2'); };
+            
+            // Add a "Start Over" button
+            const continueButton = document.querySelector('#exemptionResults #continueToGuidance');
+            continueButton.textContent = 'Start Over';
+            continueButton.style.display = 'block';
+            continueButton.onclick = function() { startOver(); };
+            
+            goToSection('exemptionResults');
+        }
+        
+        function checkExemptions() {
+            const age = parseInt(document.getElementById('age').value);
+            
+            if (isNaN(age)) {
+                alert('Please enter your age');
+                return;
+            }
+            
+            screeningData.age = age;
+            screeningData.exemptions = [];
+            
+            // Check all exemptions
+            if (age < 19) {
+                screeningData.exemptions.push({
+                    type: 'Under age 19',
+                    detail: 'Automatic exemption - not subject to work requirements'
+                });
+            } else if (age >= 65) {
+                screeningData.exemptions.push({
+                    type: 'Age 65 or older',
+                    detail: 'Automatic exemption - not subject to work requirements'
+                });
+            } else {
+                // Ages 19-64: check other exemptions
+                if (document.querySelector('input[name="youngChild"]:checked').value === 'yes') {
+                    screeningData.exemptions.push({
+                        type: 'Parent/caregiver of child ≤13',
+                        detail: 'Automatic exemption'
+                    });
+                }
+                
+                if (document.querySelector('input[name="medicare"]:checked').value === 'yes') {
+                    screeningData.exemptions.push({
+                        type: 'Enrolled in Medicare (dual eligible)',
+                        detail: 'Automatic exemption'
+                    });
+                }
+                
+                if (document.querySelector('input[name="ssi"]:checked').value === 'yes') {
+                    screeningData.exemptions.push({
+                        type: 'Receives SSI or SSDI',
+                        detail: 'Automatic exemption'
+                    });
+                }
+                
+                if (document.querySelector('input[name="pregnant"]:checked').value === 'yes') {
+                    screeningData.exemptions.push({
+                        type: 'Pregnant or postpartum',
+                        detail: 'Exempt during pregnancy and 12 months postpartum'
+                    });
+                }
+                
+                if (document.querySelector('input[name="medicallyFrail"]:checked').value === 'yes') {
+                    screeningData.exemptions.push({
+                        type: 'Medically frail / has disability',
+                        detail: ''
+                    });
+                }
+                
+                if (document.querySelector('input[name="caregiver"]:checked').value === 'yes') {
+                    screeningData.exemptions.push({
+                        type: 'Family caregiver',
+                        detail: 'You might not have to work - BUT you must show proof you help care for someone'
+                    });
+                }
+                
+                if (document.querySelector('input[name="treatment"]:checked').value === 'yes') {
+                    screeningData.exemptions.push({
+                        type: 'Participating in substance use treatment',
+                        detail: 'Exempt during treatment'
+                    });
+                }
+                
+                if (document.querySelector('input[name="veteran"]:checked').value === 'yes') {
+                    screeningData.exemptions.push({
+                        type: 'Veteran with 100% disability rating',
+                        detail: 'Automatic exemption'
+                    });
+                }
+                
+                if (document.querySelector('input[name="native"]:checked').value === 'yes') {
+                    screeningData.exemptions.push({
+                        type: 'American Indian/Alaska Native/California Indian',
+                        detail: 'Automatic exemption'
+                    });
+                }
+                
+                if (document.querySelector('input[name="incarcerated"]:checked').value === 'yes') {
+                    screeningData.exemptions.push({
+                        type: 'Recently released from jail or prison',
+                        detail: 'Temporary exemption (within 3 months of release)'
+                    });
+                }
+            }
+            
+            showExemptionResults();
+        }
+        
+        function showExemptionResults() {
+            let resultHTML = '';
+            const age = screeningData.age;
+            const exemptions = screeningData.exemptions;
+            
+            if (age < 19 || age >= 65) {
+                resultHTML += `<div class="result-box result-success">`;
+                resultHTML += `<h3>✓ YOU DON'T HAVE TO WORK</h3>`;
+                resultHTML += `<p><strong>Why:</strong> You are ${age} years old</p>`;
+                resultHTML += `<p>The work rule only applies to people ages 19-64.</p>`;
+                resultHTML += `</div>`;
+                
+                document.getElementById('continueToGuidance').style.display = 'none';
+                document.getElementById('viewFinalResults').style.display = 'block';
+            } else if (exemptions.length > 0) {
+                resultHTML += `<div class="result-box result-success">`;
+                resultHTML += `<h3>✓ You Might Not Have to Work</h3>`;
+                resultHTML += `<p>We found ${exemptions.length} reason(s) why you might not have to work.</p>`;
+                resultHTML += `</div>`;
+                
+                resultHTML += `<div class="exemption-list">`;
+                exemptions.filter(ex => 
+                    ex.type !== 'Medically frail / has disability' && 
+                    ex.type !== 'Receives SSI or SSDI' &&
+                    ex.type !== 'Pregnant or postpartum' &&
+                    ex.type !== 'Family caregiver' &&
+                    ex.type !== 'Participating in substance use treatment' &&
+                    ex.type !== 'Recently released from jail or prison'
+                ).forEach((ex, i) => {
+                    resultHTML += `<div class="exemption-item">`;
+                    resultHTML += `<strong>${i + 1}. ${ex.type}</strong>`;
+                    resultHTML += `<span>→ ${ex.detail}</span>`;
+                    resultHTML += `</div>`;
+                });
+                resultHTML += `</div>`;
+                
+                // Check if medically frail is one of the exemptions
+                const hasMedicallyFrail = exemptions.some(ex => ex.type === 'Medically frail / has disability');
+                const hasSSI = exemptions.some(ex => ex.type === 'Receives SSI or SSDI');
+                const isPregnant = exemptions.some(ex => ex.type === 'Pregnant or postpartum');
+                const isCaregiver = exemptions.some(ex => ex.type === 'Family caregiver');
+                const hasSUDTreatment = exemptions.some(ex => ex.type === 'Participating in substance use treatment');
+                const isRecentlyReleased = exemptions.some(ex => ex.type === 'Recently released from jail or prison');
+                
+                if (hasSUDTreatment) {
+                    resultHTML += `<div class="result-box result-info">`;
+                    resultHTML += `<h3>Participating in Substance Use Treatment</h3>`;
+                    resultHTML += `<ul>`;
+                    resultHTML += `<li>Having a SUD diagnosis may qualify you as medically frail.</li>`;
+                    resultHTML += `<li>Not all treatment programs qualify.</li>`;
+                    resultHTML += `<li>The specific program requirements will be clarified by summer 2026.</li>`;
+                    resultHTML += `<li>Stay informed. Visit [website coming soon].</li>`;
+                    resultHTML += `<li>MedStar Family Choice members can contact [phone number] for help.</li>`;
+                    resultHTML += `</ul>`;
+                    resultHTML += `</div>`;
+                }
+                
+                if (isRecentlyReleased) {
+                    resultHTML += `<div class="result-box result-info">`;
+                    resultHTML += `<h3>Recently Released from Jail or Prison</h3>`;
+                    resultHTML += `<ul>`;
+                    resultHTML += `<li>You will be exempt for 3 months. After this time you will be required to complete a qualifying activity.</li>`;
+                    resultHTML += `<li>The exact paperwork you will be required to submit will be known this summer.</li>`;
+                    resultHTML += `<li>Please stay informed. Visit [website coming soon].</li>`;
+                    resultHTML += `<li>For MedStar Family Choice members, please call [phone number].</li>`;
+                    resultHTML += `</ul>`;
+                    resultHTML += `</div>`;
+                }
+                
+                if (isCaregiver) {
+                    resultHTML += `<div class="result-box result-info">`;
+                    resultHTML += `<h3>Family Caregiver</h3>`;
+                    resultHTML += `<p>You might not have to work - but you will have to prove you help care for someone.</p>`;
+                    resultHTML += `<ul>`;
+                    resultHTML += `<li>The government will require you to submit paperwork proving you are a caretaker.</li>`;
+                    resultHTML += `<li>The required documents and how often you will have to submit this paperwork will be known this summer.</li>`;
+                    resultHTML += `<li>Stay informed. For more information visit [website coming soon].</li>`;
+                    resultHTML += `<li>MedStar Family Choice members can contact [phone number].</li>`;
+                    resultHTML += `</ul>`;
+                    resultHTML += `</div>`;
+                }
+                
+                if (isPregnant) {
+                    resultHTML += `<div class="result-box result-info">`;
+                    resultHTML += `<h3>If you are Pregnant or gave birth within a year you are exempt from the work requirement.</h3>`;
+                    resultHTML += `<ul>`;
+                    resultHTML += `<li>Your State/District may NOT be able to automatically verify that you are pregnant or just gave birth.</li>`;
+                    resultHTML += `<li>Be prepared to submit paperwork verifying your pregnancy/post-partum status.</li>`;
+                    resultHTML += `</ul>`;
+                    resultHTML += `</div>`;
+                }
+                
+                if (hasSSI) {
+                    resultHTML += `<div class="result-box result-info">`;
+                    resultHTML += `<h3>Receives SSI or SSDI</h3>`;
+                    resultHTML += `<p><strong>→ Automatic Exemption</strong></p>`;
+                    resultHTML += `</div>`;
+                    
+                    resultHTML += `<div class="result-box result-info">`;
+                    resultHTML += `<h3>What This Means:</h3>`;
+                    resultHTML += `<p>You <strong>might not have to work</strong> 80 hours each month to keep your Medicaid.</p>`;
+                    resultHTML += `<p><strong>BUT - You may be required to submit paperwork.</strong></p>`;
+                    resultHTML += `<p><strong>⚠️ Watch out:</strong> The rules are not finished yet. Maryland will tell you exactly what papers you need by summer 2026.</p>`;
+                    resultHTML += `</div>`;
+                }
+                
+                if (hasMedicallyFrail) {
+                    resultHTML += `<div class="result-box result-info">`;
+                    resultHTML += `<h3>Medically Frail / Has Disability</h3>`;
+                    resultHTML += `<p>You <strong>might not have to work</strong> 80 hours each month to keep your Medicaid.</p>`;
+                    resultHTML += `<p><strong>⚠️ Watch out:</strong> The rules are not finished yet. Maryland will tell you exactly what papers you need by summer 2026.</p>`;
+                    resultHTML += `</div>`;
+                    
+                    resultHTML += `<div class="result-box result-info">`;
+                    resultHTML += `<h3>📋 Next Steps</h3>`;
+                    resultHTML += `<ul>`;
+                    resultHTML += `<li><strong>Stay informed.</strong> Visit [website coming soon] for guidance.</li>`;
+                    resultHTML += `<li><strong>Talk to your health care provider</strong></li>`;
+                    resultHTML += `<li><strong>Be prepared to submit paperwork.</strong></li>`;
+                    resultHTML += `</ul>`;
+                    resultHTML += `</div>`;
+                }
+                
+                // Show the detailed "What This Means" box only if NOT medically frail AND NOT SSI/SSDI AND NOT pregnant AND NOT caregiver AND NOT SUD treatment AND NOT recently released
+                if (!hasMedicallyFrail && !hasSSI && !isPregnant && !isCaregiver && !hasSUDTreatment && !isRecentlyReleased) {
+                    resultHTML += `<div class="result-box result-info">`;
+                    resultHTML += `<h3>What This Means:</h3>`;
+                    resultHTML += `<p>You <strong>might not have to work</strong> 80 hours each month to keep your Medicaid.</p>`;
+                    resultHTML += `<p><strong>BUT - You MUST show proof:</strong></p>`;
+                    resultHTML += `<ul>`;
+                    resultHTML += `<li>Check in every 6 months</li>`;
+                    resultHTML += `<li>Tell Medicaid if anything changes</li>`;
+                    resultHTML += `<li>Answer letters within 30 days</li>`;
+                    resultHTML += `</ul>`;
+                    resultHTML += `<p><strong>⚠️ Watch out:</strong> The rules are not finished yet. Maryland will tell you exactly what papers you need by summer 2026.</p>`;
+                    resultHTML += `</div>`;
+                }
+                
+                document.getElementById('continueToGuidance').style.display = 'none';
+                document.getElementById('viewFinalResults').style.display = 'block';
+            } else {
+                resultHTML += `<div class="result-box result-warning">`;
+                resultHTML += `<h3>⚠️ You Might Have to Work</h3>`;
+                resultHTML += `<p>Based on your answers, you may need to work to keep Medicaid.</p>`;
+                resultHTML += `<p><strong>What qualifies as work:</strong></p>`;
+                resultHTML += `<ul>`;
+                resultHTML += `<li>A job</li>`;
+                resultHTML += `<li>School (at least part-time)</li>`;
+                resultHTML += `<li>Job training</li>`;
+                resultHTML += `<li>Volunteer</li>`;
+                resultHTML += `</ul>`;
+                resultHTML += `</div>`;
+                
+                resultHTML += `<div class="result-box result-info">`;
+                resultHTML += `<h3>❓ Frequently Asked Questions</h3>`;
+                resultHTML += `<p><strong>Question 1: How many hours of work/volunteering must I complete a month?</strong></p>`;
+                resultHTML += `<p>Answer: 80 hours</p>`;
+                resultHTML += `<br>`;
+                resultHTML += `<p><strong>Question 2: What happens if I don't follow the law?</strong></p>`;
+                resultHTML += `<p>Answer: You are at risk for losing your Medicaid coverage.</p>`;
+                resultHTML += `<br>`;
+                resultHTML += `<p><strong>Question 3: I have more questions and need help. Who can I ask?</strong></p>`;
+                resultHTML += `<p>Answer: You are not alone. This is a new law and can be hard to figure out. For help please visit our website at www.[website coming soon]. If you are a MedStar Family Choice member please call [phone number] to be directed to a service member who can offer guidance.</p>`;
+                resultHTML += `</div>`;
+                
+                document.getElementById('continueToGuidance').style.display = 'block';
+                document.getElementById('viewFinalResults').style.display = 'none';
+            }
+            
+            document.getElementById('exemptionResultContent').innerHTML = resultHTML;
+            goToSection('exemptionResults');
+        }
+        
+        
+        function showFinalResults() {
+            let resultHTML = '';
+            let nextStepsHTML = '';
+            
+            // Summary of eligibility
+            resultHTML += `<div class="result-box ${screeningData.eligible ? 'result-success' : 'result-danger'}">`;
+            resultHTML += `<h3>Income Eligibility</h3>`;
+            resultHTML += `<p><strong>Household:</strong> ${screeningData.householdSize} people</p>`;
+            resultHTML += `<p><strong>Income:</strong> ${formatCurrency(screeningData.annualIncome)}/year</p>`;
+            if (screeningData.eligible) {
+                resultHTML += `<p><strong>Status:</strong> ✓ Income-eligible for Medicaid</p>`;
+            } else {
+                resultHTML += `<p><strong>Status:</strong> ✗ Income exceeds Medicaid limit</p>`;
+            }
+            resultHTML += `</div>`;
+            
+            if (screeningData.eligible) {
+                // Work requirement status summary
+                const age = screeningData.age;
+                const exemptions = screeningData.exemptions;
+                
+                if (age < 19 || age >= 65 || exemptions.length > 0) {
+                    // EXEMPT users
+                    resultHTML += `<div class="result-box result-warning">`;
+                    resultHTML += `<h3>Work Requirement Status</h3>`;
+                    resultHTML += `<p><strong>May be EXEMPT from work requirements.</strong></p>`;
+                    resultHTML += `<p>You may NOT have to complete 80 hours per month of qualifying activities. However, be prepared to submit paperwork to prove your exemption status.</p>`;
+                    resultHTML += `</div>`;
+                    
+                    // Next Steps for EXEMPT users
+                    nextStepsHTML += `<div class="result-box result-info">`;
+                    nextStepsHTML += `<h3>📋 Next Steps</h3>`;
+                    
+                    nextStepsHTML += `<p><strong>1. WATCH FOR NOTICES</strong></p>`;
+                    nextStepsHTML += `<ul>`;
+                    nextStepsHTML += `<li>States will send outreach starting summer 2026</li>`;
+                    nextStepsHTML += `<li>Respond to all notices within 30 days</li>`;
+                    nextStepsHTML += `<li>Update contact information with Medicaid</li>`;
+                    nextStepsHTML += `</ul>`;
+                    
+                    nextStepsHTML += `<p><strong>2. PREPARE TO SUBMIT DOCUMENTATION</strong></p>`;
+                    nextStepsHTML += `<ul>`;
+                    nextStepsHTML += `<li>Your State or District may not be able to automatically verify your exemption status</li>`;
+                    nextStepsHTML += `<li>You may be at risk of losing your Medicaid even if you qualify for an exemption</li>`;
+                    nextStepsHTML += `<li>Talk to your health care provider early on so you don't miss any deadlines</li>`;
+                    nextStepsHTML += `</ul>`;
+                    
+                    nextStepsHTML += `<p><strong>3. GET HELP IF NEEDED</strong></p>`;
+                    nextStepsHTML += `<ul>`;
+                    nextStepsHTML += `<li>Visit [website coming soon]</li>`;
+                    nextStepsHTML += `<li>For MedStar Family Choice Members call [phone number]</li>`;
+                    nextStepsHTML += `</ul>`;
+                    nextStepsHTML += `</div>`;
+                    
+                } else {
+                    // NOT EXEMPT users
+                    resultHTML += `<div class="result-box result-warning">`;
+                    resultHTML += `<h3>Work Requirement Status</h3>`;
+                    resultHTML += `<p><strong>⚠️ Subject to work requirements</strong></p>`;
+                    resultHTML += `<p>You must complete 80 hours per month of qualifying activities starting January 2027.</p>`;
+                    resultHTML += `</div>`;
+                    
+                    // Next Steps for NON-EXEMPT users
+                    nextStepsHTML += `<div class="result-box result-info">`;
+                    nextStepsHTML += `<h3>📋 Next Steps</h3>`;
+                    
+                    nextStepsHTML += `<p><strong>1. PREPARE FOR WORK REQUIREMENTS</strong></p>`;
+                    nextStepsHTML += `<ul>`;
+                    nextStepsHTML += `<li>Implementation date: January 1, 2027</li>`;
+                    nextStepsHTML += `<li>Keep documentation of work, education, or volunteering</li>`;
+                    nextStepsHTML += `<li>Report changes in circumstances</li>`;
+                    nextStepsHTML += `</ul>`;
+                    
+                    nextStepsHTML += `<p><strong>2. WATCH FOR NOTICES</strong></p>`;
+                    nextStepsHTML += `<ul>`;
+                    nextStepsHTML += `<li>States will send outreach starting summer 2026</li>`;
+                    nextStepsHTML += `<li>Respond to all notices within 30 days</li>`;
+                    nextStepsHTML += `<li>Update contact information with Medicaid</li>`;
+                    nextStepsHTML += `</ul>`;
+                    
+                    nextStepsHTML += `<p><strong>3. GET HELP IF NEEDED</strong></p>`;
+                    nextStepsHTML += `<ul>`;
+                    nextStepsHTML += `<li>Visit [website coming soon]</li>`;
+                    nextStepsHTML += `<li>For MedStar Family Choice Members call [phone number]</li>`;
+                    nextStepsHTML += `</ul>`;
+                    nextStepsHTML += `</div>`;
+                }
+            }
+            
+            document.getElementById('finalResultContent').innerHTML = resultHTML;
+            document.getElementById('nextStepsContent').innerHTML = nextStepsHTML;
+            goToSection('finalResults');
+        }
+        
+        function printResults() {
+            window.print();
+        }
+        
+        function startOver() {
+            screeningData = {
+                householdSize: 0,
+                annualIncome: 0,
+                eligible: false,
+                age: 0,
+                exemptions: []
+            };
+            
+            // Reset all form fields
+            document.getElementById('householdSize').value = 1;
+            document.getElementById('annualIncome').value = '';
+            document.getElementById('age').value = '';
+            
+            // Reset all radio buttons
+            document.querySelectorAll('input[type="radio"]').forEach(radio => {
+                if (radio.value === 'no') {
+                    radio.checked = true;
+                }
+            });
+            
+            goToSection('welcome');
+        }
+        
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>
